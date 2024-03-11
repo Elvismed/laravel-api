@@ -28,5 +28,6 @@ Route::group([
 });
 Route::middleware('jwt.verify')->group(function(){
     Route::post('create', 'App\Http\Controllers\BooksController@create');
-    Route::get('getbook', 'App\Http\Controllers\BooksController@getbook');
+    Route::get('getbooks', 'App\Http\Controllers\BooksController@getbooks');
+    Route::get('getbook/{id}', 'App\Http\Controllers\BooksController@getbook');
 });

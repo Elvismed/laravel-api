@@ -12,7 +12,7 @@
 -   create a local mysql database.
 -   in the .env file fill database credentials, such as PORT, HOST, USERNAME, PASSWORD, DATABASE.
 -   open the terminal and run: php artisan migrate
--   to see a list of routes yo could run: php artisan route:list
+-   to see a list of routes you could run: php artisan route:list
 -   then run: php artisan serve
 -   create your credentials in the route: http://your_local_ip:8000/api/auth/register
 

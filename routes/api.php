@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
 Route::group([
 
     'middleware' => 'api',
@@ -26,8 +27,9 @@ Route::group([
     Route::post('me',  'App\Http\Controllers\AuthController@me');
     Route::post('register', 'App\Http\Controllers\AuthController@register');
 });
-Route::middleware('jwt.verify')->group(function(){
+Route::middleware('jwt.verify')->group(function () {
     Route::post('create', 'App\Http\Controllers\BooksController@create');
     Route::get('getbooks', 'App\Http\Controllers\BooksController@getbooks');
     Route::get('getbook/{id}', 'App\Http\Controllers\BooksController@getbook');
+    Route::get('statistics', 'App\Http\Controllers\BooksController@statistics');
 });

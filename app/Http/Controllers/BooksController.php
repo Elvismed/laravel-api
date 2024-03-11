@@ -5,10 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Books;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class BooksController extends Controller
 {
+
+  /**
+   * create a book if user have 'publisher' role
+   * this also create pages releated to a book, this should be a transacction
+   * @return \Illuminate\Http\JsonResponse
+   */
 
   public function create(Request $request)
   {
@@ -46,7 +53,11 @@ class BooksController extends Controller
       'book' => $book
     ], 201);
   }
-
+  /**
+   * Get books with any specified filter
+   * 'author' 'name''gender' 'created_at'
+   * @return \Illuminate\Http\JsonResponse
+   */
   public function getbooks(Request $request)
   {
     $filter = $request->filter;
@@ -59,6 +70,13 @@ class BooksController extends Controller
 
     return response()->json($books);
   }
+
+  /**
+   * Get a book with his pages
+   * Increase the reads count property in the book to use it in the statistics
+   * @return \Illuminate\Http\JsonResponse
+   */
+
   public function getbook($id)
   {
     if (!$id) {
@@ -70,5 +88,32 @@ class BooksController extends Controller
     $book->update(['reads' => $book->reads + 1, 'author_reads' => $book->author_reads + 1]);
 
     return response()->json($book);
+  }
+
+  /**
+   * Get Books statistics
+   * Most readed book, less readed book and most consulted author
+   * @return \Illuminate\Http\JsonResponse
+   */
+
+  public function statistics()
+  {
+
+    $topReads = Books::orderByRaw("CAST(`reads` as UNSIGNED) DESC")->limit(2)->get();
+
+    $lessReads = Books::orderByRaw("CAST(`reads` as UNSIGNED) ASC")->limit(2)->get();
+
+    $topAuthors =  Books::select('author', DB::raw('SUM(`reads`) as total_reads'))
+      ->groupBy('author')
+      ->orderBy('total_reads', 'DESC')
+      ->limit(2)
+      ->get();
+
+
+    return response()->json([
+      'top_reads' => $topReads,
+      'less_reads' => $lessReads,
+      'top_authors' => $topAuthors,
+    ]);
   }
 }

@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
-
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
@@ -23,8 +22,8 @@ class AuthController extends Controller
     }
 
     /**
-     * Get a JWT via given credentials.
-     *
+     * Get a JWT via given credentials Email and Password.
+     * 
      * @return \Illuminate\Http\JsonResponse
      */
     public function login()
@@ -32,21 +31,21 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
 
         try {
-            if (! $token = auth()->attempt($credentials)) {
+            if (!$token = auth()->attempt($credentials)) {
                 return response()->json(['error' => 'Invalid Credentials'], 401);
             }
-    
+
             return $this->respondWithToken($token);
-        } catch (JWTexception $e) {
+        } catch (JWTException $e) {
             return response()->json([
-                'error'=>'not created token'
-            ],500);
+                'error' => 'not created token'
+            ], 500);
         }
-        return reponse()-> json(compact('token'));
+        return reponse()->json(compact('token'));
     }
 
     /**
-     * Get the authenticated User.
+     * Get the authenticated User data.
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -93,23 +92,31 @@ class AuthController extends Controller
         ]);
     }
 
-    public function register(Request $request){
-        $validator = Validator::make($request->all(),[
-            'name'=> 'required',
-            'email'=> 'required|string|email|max:100|unique:users',
-            'password'=> 'required|string|min:6',
-            'role'=> 'required|string'
+    /**
+     * Create an User with props name, email, password and role.
+     * this role is required and should be 'user' or 'publisher'
+     * @param  string $token
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|string|email|max:100|unique:users',
+            'password' => 'required|string|min:6',
+            'role' => 'required|string'
         ]);
-        if($validator->fails()){
-            return response()->json($validator->errors()->toJson(),400);
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
         }
-      $user = User::create(array_merge(
-        $validator->validate(),
-        ['password' => bcrypt($request->password)]
-      ));
-      return response()->json([
-        'message'=>'User Created',
-        'user'=> $user
-      ],201);
+        $user = User::create(array_merge(
+            $validator->validate(),
+            ['password' => bcrypt($request->password)]
+        ));
+        return response()->json([
+            'message' => 'User Created',
+            'user' => $user
+        ], 201);
     }
 }

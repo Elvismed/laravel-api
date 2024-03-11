@@ -12,6 +12,7 @@
 -   Create a local mysql database.
 -   In the .env file fill database credentials, such as PORT, HOST, USERNAME, PASSWORD, DATABASE.
 -   Open the terminal and run: php artisan migrate
+-   Generate a jwt key in the .env file by running: php artisan jwt:secret
 -   To see a list of routes you could run: php artisan route:list
 -   Then run: php artisan serve
 -   Create your credentials in the route: http://your_local_ip:8000/api/auth/register

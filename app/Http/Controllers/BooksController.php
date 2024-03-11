@@ -48,9 +48,16 @@ class BooksController extends Controller
       ],201);
     }
 
-    public function getbook()
+    public function getbook(Request $request)
     {
-        $books = Books::find(1);
+      $filter = $request->filter;
+
+      if($filter != 'author'&& $filter != 'name'&& $filter != 'gender'&& $filter != 'created_at'){
+      return response()->json(['status'=> 'Invalid arguments in filter'],400);
+      }
+  
+        $books = Books::query()->orderBy($filter, 'asc')->get()->all();
+    
         return response()->json($books);
     }
 }
